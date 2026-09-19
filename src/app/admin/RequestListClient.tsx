@@ -174,7 +174,10 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
                     </div>
                   </div>
                   
-                  <Link href={`/admin/${req.id}`} className="block">
+                  <Link 
+                    href={`/admin/${req.id}`} 
+                    className={`block ${req.status === "rejected" ? "pointer-events-none opacity-60" : ""}`}
+                  >
                     <div className="flex flex-wrap items-center gap-2 mb-2">
                       <span className="font-bold text-base" style={titleStyle}>{req.title}</span>
                       <span className="text-xs border px-1.5 py-0.5" style={{ borderColor: "var(--rule)", color: "var(--mute)" }}>

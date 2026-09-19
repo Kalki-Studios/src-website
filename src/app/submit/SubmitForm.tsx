@@ -404,6 +404,9 @@ export function SubmitForm() {
             <div className="border border-dashed p-6 flex flex-col items-center justify-center bg-gray-50" style={{ borderColor: "var(--rule)" }}>
               <UploadDropzone
                 endpoint="projectFiles"
+                content={{
+                  allowedContent: "PDF, DOC, Images (Max 1MB)",
+                }}
                 onClientUploadComplete={(res) => {
                   if (res) {
                     const uploadedFiles = res.map(f => ({ url: f.url, name: f.name, size: f.size }));

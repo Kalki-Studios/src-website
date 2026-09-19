@@ -1,7 +1,5 @@
 "use client";
 
-"use client";
-
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
@@ -58,8 +56,17 @@ export default function Navbar() {
             onMouseEnter={(e) => (e.currentTarget.style.color = "var(--ink)")}
             onMouseLeave={(e) => (e.currentTarget.style.color = "var(--mute)")}
           >
-            How It Works
+            How it Works
           </a>
+          <Link
+            href="/status"
+            className="text-sm font-medium transition-colors duration-150"
+            style={{ color: "var(--mute)" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--ink)")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--mute)")}
+          >
+            Check Status
+          </Link>
         </div>
 
         {/* CTA */}

@@ -29,3 +29,8 @@ export async function updateAdminNotes(id: string, notes: string) {
   
   revalidatePath(`/admin/${id}`);
 }
+
+export async function deleteRequest(id: string) {
+  await db.delete(requests).where(eq(requests.id, id));
+  revalidatePath("/admin");
+}

@@ -46,15 +46,16 @@ export function RequestDetailClient({ request, attachments }: { request: any, at
           className="p-2 text-sm font-bold border rounded outline-none appearance-none"
           style={{ 
             borderColor: "var(--rule)", 
-            color: status === "accepted" ? "var(--go)" : "var(--ink)",
+            color: status === "accepted" || status === "completed" ? "var(--go)" : "var(--ink)",
             background: "var(--paper)"
           }}
         >
           <option value="new">New ▾</option>
           <option value="reviewing">Reviewing ▾</option>
           <option value="accepted">Accepted ▾</option>
+          <option value="in_progress">In Progress ▾</option>
+          <option value="completed">Completed ▾</option>
           <option value="rejected">Rejected ▾</option>
-          <option value="not_taking">Not Taking ▾</option>
         </select>
       </div>
 

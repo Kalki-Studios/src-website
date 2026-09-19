@@ -49,6 +49,8 @@ export const STATUS_LABELS: Record<string, string> = {
   new:       "New",
   reviewing: "Reviewing",
   accepted:  "Accepted",
+  in_progress: "In Progress",
+  completed: "Completed",
   rejected:  "Rejected",
 };
 

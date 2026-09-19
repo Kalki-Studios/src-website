@@ -6,8 +6,7 @@ export const uploadRouter = {
   // Accepts PDF, Word docs, and images — max 3 files, 1MB each
   projectFiles: f({
     pdf:   { maxFileSize: "1MB", maxFileCount: 3 },
-    "application/msword":                              { maxFileSize: "1MB", maxFileCount: 3 },
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": { maxFileSize: "1MB", maxFileCount: 3 },
+    blob:  { maxFileSize: "1MB", maxFileCount: 3 },
     image: { maxFileSize: "1MB", maxFileCount: 3 },
   })
     .middleware(async () => {

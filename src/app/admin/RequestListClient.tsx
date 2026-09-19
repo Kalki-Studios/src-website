@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { formatDaysLeft, getUrgency, CATEGORY_LABELS, STATUS_LABELS, BUDGET_LABELS } from "@/lib/utils/helpers";
-import { toggleStar } from "./actions";
+import { toggleStar, deleteRequest } from "./actions";
 
 type RequestData = any; // We can type this strictly later if needed
 
@@ -11,6 +11,7 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
   const [requests, setRequests] = useState<RequestData[]>(initialRequests);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const filtered = requests.filter(req => {
     if (filterStatus !== "all" && req.status !== filterStatus) return false;
@@ -34,10 +35,28 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
     await toggleStar(id, !currentState);
   };
 
+  const handleDeleteClick = (id: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    setDeletingId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deletingId) return;
+    const id = deletingId;
+    setDeletingId(null);
+    
+    // Optimistic update
+    setRequests(prev => prev.filter(r => r.id !== id));
+    await deleteRequest(id);
+  };
+
   const counts = {
     new: requests.filter(r => r.status === "new").length,
     reviewing: requests.filter(r => r.status === "reviewing").length,
     accepted: requests.filter(r => r.status === "accepted").length,
+    in_progress: requests.filter(r => r.status === "in_progress").length,
+    completed: requests.filter(r => r.status === "completed").length,
+    rejected: requests.filter(r => r.status === "rejected").length,
     all: requests.length,
   };
 
@@ -64,6 +83,27 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
           className={filterStatus === "accepted" ? "text-[var(--ink)]" : "hover:text-[var(--ink)]"}
         >
           Accepted {counts.accepted}
+        </button>
+        <span>·</span>
+        <button 
+          onClick={() => setFilterStatus("in_progress")}
+          className={filterStatus === "in_progress" ? "text-[var(--ink)]" : "hover:text-[var(--ink)]"}
+        >
+          In Progress {counts.in_progress}
+        </button>
+        <span>·</span>
+        <button 
+          onClick={() => setFilterStatus("completed")}
+          className={filterStatus === "completed" ? "text-[var(--ink)]" : "hover:text-[var(--ink)]"}
+        >
+          Completed {counts.completed}
+        </button>
+        <span>·</span>
+        <button 
+          onClick={() => setFilterStatus("rejected")}
+          className={filterStatus === "rejected" ? "text-[var(--ink)]" : "hover:text-[var(--ink)]"}
+        >
+          Rejected {counts.rejected}
         </button>
         <span>·</span>
         <button 
@@ -103,7 +143,7 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
                 
                 <button 
                   onClick={() => handleToggleStar(req.id, req.starred)}
-                  className="text-xl leading-none focus:outline-none hidden sm:block"
+                  className="text-xl leading-none focus:outline-none hidden sm:block mt-1"
                   style={{ color: req.starred ? "#EAB308" : "var(--rule)" }}
                 >
                   {req.starred ? "★" : "☆"}
@@ -114,9 +154,6 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
                     <div className="text-xs font-semibold text-[var(--mute)]">
                       <span className="sm:hidden mr-2" onClick={() => handleToggleStar(req.id, req.starred)} style={{ color: req.starred ? "#EAB308" : "var(--rule)" }}>{req.starred ? "★" : "☆"}</span>
                       {req.studentName} · {req.college}
-                    </div>
-                    <div className="text-xs font-mono font-bold text-[var(--mute)]">
-                      {req.refCode}
                     </div>
                   </div>
                   
@@ -142,11 +179,48 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
                   </Link>
                 </div>
 
+                <div className="flex flex-col items-end shrink-0 gap-4 mt-1">
+                  <div className="font-mono text-xs font-bold text-[var(--mute)]">{req.refCode}</div>
+                  <button 
+                    onClick={(e) => handleDeleteClick(req.id, e)}
+                    className="text-xs font-bold text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded transition-colors"
+                  >
+                    Delete
+                  </button>
+                </div>
+
               </div>
             );
           })
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deletingId && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+          <div className="bg-white p-6 max-w-sm w-full rounded shadow-xl">
+            <h3 className="text-lg font-bold text-[var(--ink)] mb-2">Delete Request?</h3>
+            <p className="text-sm text-[var(--mute)] mb-6">
+              Are you sure you want to delete this request? This action cannot be undone and will delete any attached files.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button 
+                onClick={() => setDeletingId(null)}
+                className="px-4 py-2 text-sm font-semibold border rounded hover:bg-gray-50"
+                style={{ borderColor: "var(--rule)", color: "var(--ink)" }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmDelete}
+                className="px-4 py-2 text-sm font-semibold bg-red-500 text-white rounded hover:bg-red-600"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

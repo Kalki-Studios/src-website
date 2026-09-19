@@ -5,12 +5,13 @@ export const metadata = {
   title: "Request Submitted — SRC e-solutions",
 };
 
-export default function SubmittedPage({
+export default async function SubmittedPage({
   searchParams,
 }: {
-  searchParams: { code?: string };
+  searchParams: Promise<{ code?: string }>;
 }) {
-  const code = searchParams.code || "SRC-XXXX";
+  const { code: rawCode } = await searchParams;
+  const code = rawCode || "SRC-XXXX";
 
   return (
     <div className="min-h-screen bg-[var(--paper)] flex flex-col items-center pt-24 px-6">
@@ -39,12 +40,12 @@ export default function SubmittedPage({
         </div>
 
         <div className="pt-6 border-t" style={{ borderColor: "var(--rule)" }}>
-          <p className="text-xs text-[var(--mute)] mb-4">
-            Save this reference code — you can use it to check your request status.
+          <p className="text-sm font-bold text-red-600 bg-red-50 p-3 rounded mb-4 border border-red-100">
+            NOTE: Keep this reference code for future requirements. It is strictly required to check your request status.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <Link 
-              href={`/status/${code}`}
+              href={`/status?code=${code}`}
               className="px-4 py-2 bg-[var(--ink)] text-white text-sm font-semibold text-center transition-opacity hover:opacity-90"
             >
               Check status →

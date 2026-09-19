@@ -68,7 +68,7 @@ export default function HeroStepOne() {
   };
 
   return (
-    <section className="relative min-h-[90vh] flex flex-col justify-center overflow-hidden pt-20 pb-12">
+    <section className="relative min-h-screen flex flex-col justify-center overflow-hidden pt-20 pb-12">
       {/* Grid texture background */}
       <div className="absolute inset-0 grid-texture-faint pointer-events-none" />
 

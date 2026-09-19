@@ -28,7 +28,7 @@ export default async function RequestDetailPage({
   const reqAttachments = await db.select().from(attachments).where(eq(attachments.requestId, req.id));
 
   return (
-    <div className="bg-white border pb-24" style={{ borderColor: "var(--rule)" }}>
+    <div className="bg-white border pb-24 relative" style={{ borderColor: "var(--rule)" }}>
       <div className="p-4 sm:p-6 border-b" style={{ borderColor: "var(--rule)" }}>
         <Link href="/admin" className="text-sm font-semibold text-[var(--mute)] hover:text-[var(--ink)] mb-4 inline-block">
           ← Back

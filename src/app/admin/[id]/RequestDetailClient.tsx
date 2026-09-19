@@ -40,16 +40,29 @@ export function RequestDetailClient({ request, attachments }: { request: any, at
           </div>
         </div>
         <div className="flex flex-col items-end gap-3">
-          <div 
-            className="p-2 px-4 text-sm font-bold border rounded"
-            style={{ 
+          {(() => {
+            let badgeStyle: React.CSSProperties = { 
               borderColor: "var(--rule)", 
-              color: status === "in_progress" || status === "accepted" || status === "completed" ? "var(--go)" : status === "rejected" ? "var(--flag)" : "var(--ink)",
-              background: "var(--paper)"
-            }}
-          >
-            {status === "in_progress" ? "In Progress" : status.charAt(0).toUpperCase() + status.slice(1)}
-          </div>
+              color: "white", 
+              background: "var(--paper)",
+              textDecoration: "none"
+            };
+            if (status === "accepted") { badgeStyle.background = "var(--go)"; badgeStyle.borderColor = "var(--go)"; }
+            else if (status === "rejected") { badgeStyle.background = "var(--flag)"; badgeStyle.borderColor = "var(--flag)"; }
+            else if (status === "reviewing") { badgeStyle.background = "#3b82f6"; badgeStyle.borderColor = "#3b82f6"; }
+            else if (status === "in_progress") { badgeStyle.background = "#eab308"; badgeStyle.borderColor = "#eab308"; }
+            else if (status === "completed") { badgeStyle.background = "var(--mute)"; badgeStyle.borderColor = "var(--mute)"; badgeStyle.textDecoration = "line-through"; }
+            else { badgeStyle.color = "var(--ink)"; }
+
+            return (
+              <div 
+                className="absolute top-4 right-4 sm:top-6 sm:right-6 py-1 px-3 text-xs font-bold border rounded-sm shadow-sm"
+                style={badgeStyle}
+              >
+                {status === "in_progress" ? "In Progress" : status.charAt(0).toUpperCase() + status.slice(1)}
+              </div>
+            );
+          })()}
 
           {(status === "new" || status === "reviewing") && (
             <div className="flex gap-2">

@@ -56,7 +56,15 @@ export const attachments = pgTable("attachments", {
   createdAt:   timestamp("created_at").defaultNow().notNull(),
 });
 
+// ─── Settings ──────────────────────────────────────────────────────
+export const settings = pgTable("settings", {
+  id: serial("id").primaryKey(),
+  adminPassword: text("admin_password").notNull(),
+  isUnderConstruction: boolean("is_under_construction").default(false).notNull(),
+});
+
 // ─── Types ───────────────────────────────────────────────────────
 export type Request    = typeof requests.$inferSelect;
 export type NewRequest = typeof requests.$inferInsert;
 export type Attachment = typeof attachments.$inferSelect;
+export type Settings   = typeof settings.$inferSelect;

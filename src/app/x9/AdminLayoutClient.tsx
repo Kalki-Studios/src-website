@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { adminLogout } from "./login/actions";
+import { SettingsModal } from "@/components/SettingsModal";
 
 export function AdminLayoutClient({ children, storageWidget }: { children: React.ReactNode, storageWidget?: React.ReactNode }) {
   const pathname = usePathname();
@@ -25,6 +26,7 @@ export function AdminLayoutClient({ children, storageWidget }: { children: React
             SRC <span className="font-normal">Dashboard</span>
           </Link>
           <div className="flex items-center">
+            <SettingsModal />
             {storageWidget}
             <button 
               onClick={handleLogout}

@@ -5,11 +5,15 @@ import { cookies } from "next/headers";
 
 const SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 
+import { getSettings } from "../settings-actions";
+
 export async function adminLogin(formData: FormData) {
   const email = formData.get("email");
   const password = formData.get("password");
 
-  if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+  const currentSettings = await getSettings();
+
+  if (email === process.env.ADMIN_EMAIL && password === currentSettings.adminPassword) {
     // Generate JWT
     const alg = "HS256";
     const jwt = await new SignJWT({ role: "admin" })

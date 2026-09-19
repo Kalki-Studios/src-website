@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { submitProjectRequest } from "../actions";
+import { submitProjectRequest } from "@/app/actions";
 import { UploadButton } from "@/components/ui/uploadthing";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";

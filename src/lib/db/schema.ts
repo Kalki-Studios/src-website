@@ -38,9 +38,10 @@ export const requests = pgTable("requests", {
   source:       text("source"),                               // how they heard about us
 
   // Admin fields
-  status:       text("status").default("new").notNull(),      // new|reviewing|accepted|rejected
+  status:       text("status").default("new").notNull(),      // new|reviewing|accepted|rejected|in_progress|completed
   starred:      boolean("starred").default(false).notNull(),
   adminNotes:   text("admin_notes"),
+  rejectedAt:   timestamp("rejected_at"),                     // set when rejected; used for 3-month auto-delete
 });
 
 // ─── Attachments ─────────────────────────────────────────────────

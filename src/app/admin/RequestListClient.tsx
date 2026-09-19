@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { formatDaysLeft, getUrgency, CATEGORY_LABELS, STATUS_LABELS, BUDGET_LABELS } from "@/lib/utils/helpers";
-import { toggleStar, deleteRequest } from "./actions";
+import { toggleStar, deleteRequest, deleteAllRejectedRequests } from "./actions";
 
 type RequestData = any; // We can type this strictly later if needed
 
@@ -12,6 +12,7 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [isDeletingAll, setIsDeletingAll] = useState(false);
 
   const filtered = requests.filter(req => {
     if (filterStatus !== "all" && req.status !== filterStatus) return false;
@@ -50,6 +51,14 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
     // Optimistic update
     setRequests(prev => prev.filter(r => r.id !== id));
     await deleteRequest(id);
+  };
+
+  const handleDeleteAllRejected = async () => {
+    if (!confirm("Are you sure you want to delete ALL rejected projects? This cannot be undone.")) return;
+    setIsDeletingAll(true);
+    await deleteAllRejectedRequests();
+    setRequests(prev => prev.filter(r => r.status !== "rejected"));
+    setIsDeletingAll(false);
   };
 
   const counts = {
@@ -116,7 +125,7 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
         </button>
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex flex-wrap gap-4 items-center justify-between">
         <input 
           type="text" 
           placeholder="Search by ref code, name, phone, email, college..." 
@@ -125,6 +134,16 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
           className="w-full sm:max-w-md p-2 border text-sm outline-none focus:border-[var(--ink)] transition-colors bg-white"
           style={{ borderColor: "var(--rule)" }}
         />
+        
+        {filterStatus === "rejected" && counts.rejected > 0 && (
+          <button
+            onClick={handleDeleteAllRejected}
+            disabled={isDeletingAll}
+            className="px-4 py-2 text-sm font-bold text-white bg-red-500 hover:bg-red-600 rounded transition-colors disabled:opacity-50 shrink-0"
+          >
+            {isDeletingAll ? "Deleting..." : "Delete All Rejected"}
+          </button>
+        )}
       </div>
 
       <div className="bg-white border divide-y" style={{ borderColor: "var(--rule)" }}>
@@ -199,8 +218,28 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
                   </Link>
                 </div>
 
-                <div className="flex flex-col items-end shrink-0 gap-4 mt-1">
+                <div className="flex flex-col items-end shrink-0 gap-2 mt-1">
                   <div className="font-mono text-xs font-bold text-[var(--mute)]">{req.refCode}</div>
+                  {req.status === "rejected" && req.rejectedAt && (() => {
+                    const rejectedDate = new Date(req.rejectedAt);
+                    const deleteDate = new Date(rejectedDate);
+                    deleteDate.setMinutes(deleteDate.getMinutes() + 2); // 2 minutes for testing
+                    const minutesLeft = Math.ceil((deleteDate.getTime() - Date.now()) / (1000 * 60));
+                    
+                    if (minutesLeft <= 0) {
+                      return (
+                        <div className="text-xs text-red-500 flex items-center gap-1 text-right font-bold">
+                          🕐 <span>Deleting on next refresh...</span>
+                        </div>
+                      );
+                    }
+                    
+                    return (
+                      <div className="text-xs text-[var(--mute)] flex items-center gap-1 text-right">
+                        🕐 <span>Auto-delete in {minutesLeft}m</span>
+                      </div>
+                    );
+                  })()}
                   <button 
                     onClick={(e) => handleDeleteClick(req.id, e)}
                     className="text-xs font-bold text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded transition-colors"

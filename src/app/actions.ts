@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { requests, attachments } from "@/lib/db/schema";
 import { generateRefCode } from "@/lib/utils/helpers";
+import { or, eq, gte, and } from "drizzle-orm";
 
 export type SubmitResult =
   | { success: true; refCode: string }
@@ -10,6 +11,38 @@ export type SubmitResult =
 
 export async function submitProjectRequest(formData: any): Promise<SubmitResult> {
   try {
+    // ── 4-month cooldown check ──────────────────────────────────────
+    const fourMonthsAgo = new Date();
+    fourMonthsAgo.setMonth(fourMonthsAgo.getMonth() - 4);
+
+    const existing = await db
+      .select({ id: requests.id, createdAt: requests.createdAt })
+      .from(requests)
+      .where(
+        and(
+          or(
+            eq(requests.phone, formData.phone),
+            eq(requests.email, formData.email.toLowerCase())
+          ),
+          gte(requests.createdAt, fourMonthsAgo)
+        )
+      )
+      .limit(1);
+
+    if (existing.length > 0) {
+      const submittedAt = new Date(existing[0].createdAt);
+      const canResubmitAt = new Date(submittedAt);
+      canResubmitAt.setMonth(canResubmitAt.getMonth() + 4);
+      const canResubmitStr = canResubmitAt.toLocaleDateString("en-GB", {
+        day: "numeric", month: "long", year: "numeric"
+      });
+      return {
+        success: false,
+        error: `You have already submitted a project request recently. You can submit again after ${canResubmitStr}.`,
+      };
+    }
+    // ───────────────────────────────────────────────────────────────
+
     const refCode = generateRefCode();
 
     const [newRequest] = await db.insert(requests).values({
@@ -18,7 +51,7 @@ export async function submitProjectRequest(formData: any): Promise<SubmitResult>
       college: formData.college,
       phone: formData.phone,
       whatsapp: formData.whatsapp || formData.phone,
-      email: formData.email,
+      email: formData.email.toLowerCase(),
       category: formData.category,
       title: formData.title,
       description: formData.description,
@@ -34,7 +67,7 @@ export async function submitProjectRequest(formData: any): Promise<SubmitResult>
       await db.insert(attachments).values(
         formData.files.map((file: any) => ({
           requestId: newRequest.id,
-          storageKey: file.key ?? file.url,  // UploadThing key or fallback to URL
+          storageKey: file.key ?? file.url,
           fileUrl: file.url,
           fileName: file.name,
           sizeBytes: file.size,
@@ -45,6 +78,9 @@ export async function submitProjectRequest(formData: any): Promise<SubmitResult>
     return { success: true, refCode };
   } catch (error: any) {
     console.error("Submission failed:", error);
+    console.error("Error Code:", error.code);
+    console.error("Error Detail:", error.detail);
+    console.error("Error Message:", error.message);
     return { success: false, error: error.message || "Failed to submit request" };
   }
 }

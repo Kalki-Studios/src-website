@@ -220,23 +220,24 @@ export function RequestDetailClient({ request, attachments }: { request: any, at
       </section>
 
       {/* FIXED BOTTOM ACTIONS */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-10" style={{ borderColor: "var(--rule)" }}>
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row gap-3">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]" style={{ borderColor: "var(--rule)" }}>
+        <div className="max-w-5xl mx-auto flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-4">
+          <button 
+            onClick={handleCopyDetails}
+            className="w-full sm:w-auto py-3 px-6 sm:px-8 border bg-white font-semibold text-sm rounded-xl hover:bg-gray-50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm"
+            style={{ borderColor: "var(--rule)", color: "var(--ink)" }}
+          >
+            <span className="text-base">📋</span> Copy details
+          </button>
+          
           <a 
             href={whatsappUrl}
             target="_blank" 
             rel="noopener noreferrer"
-            className="flex-1 py-3 bg-[var(--go)] text-white text-center font-bold text-sm sm:text-base hover:opacity-90 transition-opacity"
+            className="w-full sm:w-auto py-3 px-6 sm:px-8 bg-gradient-to-r from-[#21A85C] to-[#188C4A] text-white text-center font-bold text-sm sm:text-base rounded-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
-            💬 Message on WhatsApp
+            <span className="text-lg leading-none">💬</span> Message on WhatsApp
           </a>
-          <button 
-            onClick={handleCopyDetails}
-            className="sm:w-auto py-3 px-6 border bg-white font-semibold text-sm hover:bg-gray-50 transition-colors"
-            style={{ borderColor: "var(--rule)", color: "var(--ink)" }}
-          >
-            📋 Copy details
-          </button>
         </div>
       </div>
 

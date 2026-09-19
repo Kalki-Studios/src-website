@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { requests, attachments } from "@/lib/db/schema";
 import { generateRefCode } from "@/lib/utils/helpers";
 import { or, eq, gte, and } from "drizzle-orm";
+import nodemailer from "nodemailer";
 
 export type SubmitResult =
   | { success: true; refCode: string }
@@ -74,6 +75,53 @@ export async function submitProjectRequest(formData: any): Promise<SubmitResult>
         }))
       );
     }
+
+    // ── Send Email Notification ─────────────────────────────────────────
+    if (process.env.EMAIL_USER && process.env.EMAIL_APP_PASSWORD) {
+      try {
+        const transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_APP_PASSWORD,
+          },
+        });
+
+        const mailOptions = {
+          from: `SRC Notifier <${process.env.EMAIL_USER}>`,
+          to: process.env.EMAIL_USER, // Send notification to himself
+          subject: `🚨 New Request: ${refCode} - ${formData.title}`,
+          html: `
+            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #111827;">New Project Request Submitted!</h2>
+              <p><strong>Ref Code:</strong> ${refCode}</p>
+              <p><strong>Student:</strong> ${formData.studentName} (${formData.college})</p>
+              <p><strong>Phone / WhatsApp:</strong> ${formData.phone} / ${formData.whatsapp || formData.phone}</p>
+              <p><strong>Email:</strong> ${formData.email}</p>
+              <p><strong>Category:</strong> ${formData.category}</p>
+              <p><strong>Title:</strong> ${formData.title}</p>
+              <p><strong>Deadline:</strong> ${new Date(formData.deadline).toLocaleDateString("en-GB")}</p>
+              <p><strong>Budget:</strong> ${formData.budgetBand}</p>
+              <br/>
+              <p><strong>Description:</strong></p>
+              <div style="background: #f3f4f6; padding: 15px; border-radius: 8px;">
+                <p style="margin: 0; white-space: pre-wrap;">${formData.description}</p>
+              </div>
+              <br/>
+              <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/x9" style="display: inline-block; padding: 12px 24px; background: #111827; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold;">View on Dashboard</a>
+            </div>
+          `,
+        };
+
+        // Fire and forget so we don't delay the response to the user
+        transporter.sendMail(mailOptions).catch(err => {
+          console.error("Failed to send email notification:", err);
+        });
+      } catch (emailErr) {
+        console.error("Failed to setup email transporter:", emailErr);
+      }
+    }
+    // ──────────────────────────────────────────────────────────────────
 
     return { success: true, refCode };
   } catch (error: any) {

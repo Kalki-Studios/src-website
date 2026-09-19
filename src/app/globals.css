@@ -1,0 +1,160 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ─── SRC e-solutions Design Tokens ───────────────────────────── */
+:root {
+  /* 6-token palette — the entire UI is built on these */
+  --ink:    #16233A;   /* deep navy — text, headers */
+  --paper:  #FFFFFF;   /* backgrounds */
+  --rule:   #DDE3EC;   /* grid lines, borders, dividers */
+  --mute:   #5B6B84;   /* secondary text, labels */
+  --go:     #0B6E4F;   /* accepted / success / WhatsApp */
+  --flag:   #C2410C;   /* deadline pressure ONLY — never decorative */
+
+  /* Category badge colours */
+  --cat-web:      #2563EB;
+  --cat-app:      #7C3AED;
+  --cat-ml:       #0891B2;
+  --cat-iot:      #D97706;
+  --cat-desktop:  #059669;
+  --cat-other:    #6B7280;
+
+  /* Typography */
+  --font-sans:  var(--font-geist-sans);
+  --font-mono:  var(--font-geist-mono);
+
+  /* Spacing / radius */
+  --radius: 4px;
+
+  /* shadcn/ui bridge — map our tokens to their variables */
+  --background:         var(--paper);
+  --foreground:         var(--ink);
+  --card:               var(--paper);
+  --card-foreground:    var(--ink);
+  --popover:            var(--paper);
+  --popover-foreground: var(--ink);
+  --primary:            var(--ink);
+  --primary-foreground: var(--paper);
+  --secondary:          #F1F4F8;
+  --secondary-foreground: var(--ink);
+  --muted:              #F1F4F8;
+  --muted-foreground:   var(--mute);
+  --accent:             #EEF2F7;
+  --accent-foreground:  var(--ink);
+  --destructive:        var(--flag);
+  --border:             var(--rule);
+  --input:              var(--rule);
+  --ring:               var(--ink);
+  --radius:             4px;
+}
+
+@theme inline {
+  --color-background:       var(--background);
+  --color-foreground:       var(--foreground);
+  --color-card:             var(--card);
+  --color-card-foreground:  var(--card-foreground);
+  --color-primary:          var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted:            var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border:           var(--border);
+  --color-input:            var(--input);
+  --color-ring:             var(--ring);
+  --color-destructive:      var(--destructive);
+  --font-sans:              var(--font-geist-sans);
+  --font-mono:              var(--font-geist-mono);
+  --radius-sm:              2px;
+  --radius-md:              4px;
+  --radius-lg:              6px;
+}
+
+/* ─── Base styles ──────────────────────────────────────────────── */
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: var(--font-geist-sans), system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    min-height: 100vh;
+    color: var(--ink);
+    background: var(--paper);
+  }
+
+  /* Tabular numerals for dashboard number columns */
+  .tabular { font-variant-numeric: tabular-nums; }
+
+  /* IBM Plex Mono for reference codes */
+  .mono {
+    font-family: var(--font-geist-mono), 'Courier New', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  /* Max line length for readability */
+  .prose-width { max-width: 65ch; }
+
+  /* Left-aligned — never center hero text */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--ink);
+  }
+}
+
+/* ─── Hairline grid texture ────────────────────────────────────── */
+.grid-texture {
+  background-image:
+    linear-gradient(to right,  var(--rule) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--rule) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: center center;
+}
+
+.grid-texture-faint {
+  background-image:
+    linear-gradient(to right,  color-mix(in srgb, var(--rule) 40%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--rule) 40%, transparent) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* ─── Utility overrides ─────────────────────────────────────────── */
+.ink     { color: var(--ink); }
+.paper   { color: var(--paper); }
+.muted   { color: var(--mute); }
+.go      { color: var(--go); }
+.flag    { color: var(--flag); }
+
+.bg-ink     { background-color: var(--ink); }
+.bg-paper   { background-color: var(--paper); }
+.bg-rule    { background-color: var(--rule); }
+.bg-go      { background-color: var(--go); }
+.bg-flag    { background-color: var(--flag); }
+
+/* ─── Category badge colours ────────────────────────────────────── */
+.badge-web     { background: color-mix(in srgb, var(--cat-web) 12%, transparent);  color: var(--cat-web);      border: 1px solid color-mix(in srgb, var(--cat-web) 30%, transparent); }
+.badge-app     { background: color-mix(in srgb, var(--cat-app) 12%, transparent);  color: var(--cat-app);      border: 1px solid color-mix(in srgb, var(--cat-app) 30%, transparent); }
+.badge-ml      { background: color-mix(in srgb, var(--cat-ml)  12%, transparent);  color: var(--cat-ml);       border: 1px solid color-mix(in srgb, var(--cat-ml)  30%, transparent); }
+.badge-iot     { background: color-mix(in srgb, var(--cat-iot) 12%, transparent);  color: var(--cat-iot);      border: 1px solid color-mix(in srgb, var(--cat-iot) 30%, transparent); }
+.badge-desktop { background: color-mix(in srgb, var(--cat-desktop) 12%, transparent); color: var(--cat-desktop); border: 1px solid color-mix(in srgb, var(--cat-desktop) 30%, transparent); }
+.badge-other   { background: color-mix(in srgb, var(--cat-other) 12%, transparent); color: var(--cat-other);   border: 1px solid color-mix(in srgb, var(--cat-other) 30%, transparent); }
+
+/* ─── Reduced motion ────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

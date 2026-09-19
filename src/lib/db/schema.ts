@@ -1,0 +1,61 @@
+import {
+  pgTable,
+  uuid,
+  text,
+  date,
+  boolean,
+  jsonb,
+  timestamp,
+  serial,
+} from "drizzle-orm/pg-core";
+
+// ─── Project Requests ────────────────────────────────────────────
+export const requests = pgTable("requests", {
+  id:           uuid("id").primaryKey().defaultRandom(),
+  refCode:      text("ref_code").unique().notNull(),          // SRC-7K2M
+  createdAt:    timestamp("created_at").defaultNow().notNull(),
+  updatedAt:    timestamp("updated_at").defaultNow().notNull(),
+
+  // Student info
+  studentName:  text("student_name").notNull(),
+  college:      text("college").notNull(),
+  phone:        text("phone").notNull(),
+  whatsapp:     text("whatsapp"),
+  email:        text("email").notNull(),
+
+  // Project info
+  category:     text("category").notNull(),                   // web|app|ml|iot|software|unsure
+  title:        text("title").notNull(),
+  description:  text("description").notNull(),
+  deliverable:  text("deliverable").notNull(),                // prototype|complete|modify|demo|unsure
+  techNotes:    text("tech_notes"),
+  branchAnswers: jsonb("branch_answers"),                     // category-specific Q&A
+  deadline:     date("deadline").notNull(),
+  budgetBand:   text("budget_band").notNull(),
+
+  // Extra
+  extraNotes:   text("extra_notes"),
+  source:       text("source"),                               // how they heard about us
+
+  // Admin fields
+  status:       text("status").default("new").notNull(),      // new|reviewing|accepted|rejected
+  starred:      boolean("starred").default(false).notNull(),
+  adminNotes:   text("admin_notes"),
+});
+
+// ─── Attachments ─────────────────────────────────────────────────
+export const attachments = pgTable("attachments", {
+  id:          uuid("id").primaryKey().defaultRandom(),
+  requestId:   uuid("request_id").references(() => requests.id, { onDelete: "cascade" }).notNull(),
+  storageKey:  text("storage_key").notNull(),                 // Uploadthing file key
+  fileName:    text("file_name").notNull(),
+  fileUrl:     text("file_url").notNull(),                    // Uploadthing public URL
+  sizeBytes:   serial("size_bytes"),
+  mimeType:    text("mime_type"),
+  createdAt:   timestamp("created_at").defaultNow().notNull(),
+});
+
+// ─── Types ───────────────────────────────────────────────────────
+export type Request    = typeof requests.$inferSelect;
+export type NewRequest = typeof requests.$inferInsert;
+export type Attachment = typeof attachments.$inferSelect;

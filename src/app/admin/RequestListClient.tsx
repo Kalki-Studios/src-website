@@ -137,6 +137,21 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
             let urgencyColor = "var(--ink)";
             if (urgency === "overdue" || urgency === "critical") urgencyColor = "var(--flag)";
             if (urgency === "comfortable") urgencyColor = "var(--mute)";
+            let badgeStyle: React.CSSProperties = { 
+              borderColor: "var(--rule)", 
+              color: "var(--ink)", 
+              background: "var(--paper)" 
+            };
+            if (req.status === "accepted") { badgeStyle.color = "white"; badgeStyle.borderColor = "var(--go)"; badgeStyle.background = "var(--go)"; }
+            else if (req.status === "rejected") { badgeStyle.color = "white"; badgeStyle.borderColor = "var(--flag)"; badgeStyle.background = "var(--flag)"; }
+            else if (req.status === "reviewing") { badgeStyle.color = "white"; badgeStyle.borderColor = "#3B82F6"; badgeStyle.background = "#3B82F6"; } // Blue
+            else if (req.status === "in_progress") { badgeStyle.color = "white"; badgeStyle.borderColor = "#EAB308"; badgeStyle.background = "#EAB308"; } // Yellow
+
+            let titleStyle: React.CSSProperties = { color: "var(--ink)", textDecoration: "none" };
+            if (req.status === "completed") {
+              titleStyle.color = "var(--mute)";
+              titleStyle.textDecoration = "line-through";
+            }
 
             return (
               <div key={req.id} className="p-4 flex flex-col sm:flex-row gap-4 hover:bg-gray-50 transition-colors">
@@ -159,11 +174,11 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
                   
                   <Link href={`/admin/${req.id}`} className="block">
                     <div className="flex flex-wrap items-center gap-2 mb-2">
-                      <span className="font-bold text-[var(--ink)] text-base">{req.title}</span>
+                      <span className="font-bold text-base" style={titleStyle}>{req.title}</span>
                       <span className="text-xs border px-1.5 py-0.5" style={{ borderColor: "var(--rule)", color: "var(--mute)" }}>
                         {CATEGORY_LABELS[req.category] || req.category}
                       </span>
-                      <span className="text-xs border px-1.5 py-0.5" style={{ borderColor: "var(--rule)", color: "var(--ink)", background: "color-mix(in srgb, var(--rule) 20%, transparent)" }}>
+                      <span className="text-xs border px-1.5 py-0.5" style={badgeStyle}>
                         {STATUS_LABELS[req.status] || req.status}
                       </span>
                     </div>

@@ -3,11 +3,11 @@ import { createUploadthing, type FileRouter } from "uploadthing/next";
 const f = createUploadthing();
 
 export const uploadRouter = {
-  // Accepts PDF, Word docs, and images — max 3 files, 1MB each
+  // Accepts 1 file only — max 1MB
   projectFiles: f({
-    pdf:   { maxFileSize: "1MB", maxFileCount: 3 },
-    blob:  { maxFileSize: "1MB", maxFileCount: 3 },
-    image: { maxFileSize: "1MB", maxFileCount: 3 },
+    pdf:   { maxFileSize: "1MB", maxFileCount: 1 },
+    blob:  { maxFileSize: "1MB", maxFileCount: 1 },
+    image: { maxFileSize: "1MB", maxFileCount: 1 },
   })
     .middleware(async () => {
       // Public upload — no auth required (students submit without accounts)

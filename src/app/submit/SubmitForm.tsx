@@ -3,7 +3,11 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { submitProjectRequest } from "../actions";
-import { UploadDropzone } from "@/components/ui/uploadthing";
+import { UploadButton } from "@/components/ui/uploadthing";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/style.css";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
 
 const CATEGORIES = [
   { id: "web", label: "Website / Web App", icon: "</>" },
@@ -37,6 +41,7 @@ export function SubmitForm() {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -58,31 +63,64 @@ export function SubmitForm() {
   });
 
   const [usePhoneForWhatsApp, setUsePhoneForWhatsApp] = useState(true);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const datePickerRef = useRef<HTMLDivElement>(null);
 
-  // Initialize from URL params if present
   useEffect(() => {
-    const queryCategory = searchParams?.get("category");
-    const queryTitle = searchParams?.get("title");
-    
-    if (queryCategory) {
-      setFormData(prev => ({ 
-        ...prev, 
-        category: queryCategory,
-        ...(queryTitle && { title: queryTitle })
-      }));
-      setStep(2);
+    function handleClickOutside(event: MouseEvent) {
+      if (datePickerRef.current && !datePickerRef.current.contains(event.target as Node)) {
+        setShowDatePicker(false);
+      }
     }
-  }, [searchParams]);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-  // Load from localStorage on mount
+  // Initialize state on mount (prioritize URL params over localStorage)
   useEffect(() => {
+    let initialData = {
+      category: "",
+      title: "",
+      description: "",
+      deliverable: "",
+      techNotes: "",
+      deadline: "",
+      budgetBand: "",
+      files: [] as any[],
+      studentName: "",
+      college: "",
+      phone: "",
+      whatsapp: "",
+      email: "",
+      extraNotes: "",
+      branchAnswers: {} as Record<string, string>,
+    };
+
+    // 1. Load from localStorage if present
     const saved = localStorage.getItem("src_form_draft");
     if (saved) {
       try {
-        setFormData(prev => ({ ...prev, ...JSON.parse(saved) }));
+        initialData = { ...initialData, ...JSON.parse(saved) };
       } catch (e) {}
     }
-  }, []);
+
+    // 2. Override with URL params if present
+    const queryCategory = searchParams?.get("category");
+    const queryTitle = searchParams?.get("title");
+    
+    let nextStep = 1;
+    
+    if (queryCategory) {
+      initialData.category = queryCategory;
+      if (queryTitle) initialData.title = queryTitle;
+      nextStep = 2;
+    } else if (initialData.category) {
+      nextStep = 2;
+    }
+
+    setFormData(initialData);
+    setStep(nextStep);
+  }, [searchParams]);
 
   // Save to localStorage on change
   useEffect(() => {
@@ -107,7 +145,12 @@ export function SubmitForm() {
 
   const validateStep2 = () => formData.title && formData.description && formData.deliverable;
   const validateStep3 = () => formData.deadline && formData.budgetBand;
-  const validateStep4 = () => formData.studentName && formData.college && formData.phone && formData.email;
+  const validateStep4 = () => {
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
+    const isValidPhone = /^\d{10}$/.test(formData.phone);
+    const isValidWhatsApp = usePhoneForWhatsApp || /^\d{10}$/.test(formData.whatsapp);
+    return formData.studentName && formData.college && isValidPhone && isValidWhatsApp && isValidEmail;
+  };
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -140,6 +183,9 @@ export function SubmitForm() {
     completenessColor = "var(--ink)";
   }
 
+  // If category is cleared or empty, force back to step 1
+  const effectiveStep = formData.category ? step : 1;
+
   return (
     <div className="w-full relative overflow-hidden pb-20">
       {/* Progress Bar */}
@@ -148,12 +194,12 @@ export function SubmitForm() {
           <div
             key={s}
             className="h-1 flex-1 transition-all duration-300"
-            style={{ background: s <= step ? "var(--ink)" : "var(--rule)" }}
+            style={{ background: s <= effectiveStep ? "var(--ink)" : "var(--rule)" }}
           />
         ))}
       </div>
 
-      <div className="text-sm font-semibold mb-8 text-[var(--mute)]">Step {step} of 4</div>
+      <div className="text-sm font-semibold mb-8 text-[var(--mute)]">Step {effectiveStep} of 4</div>
 
       {error && (
         <div className="mb-6 p-4 rounded bg-red-50 text-red-700 text-sm border border-red-200">
@@ -162,7 +208,7 @@ export function SubmitForm() {
       )}
 
       {/* STEP 1: Category */}
-      {step === 1 && (
+      {effectiveStep === 1 && (
         <div className="animate-in slide-in-from-right-4 fade-in duration-200">
           <h2 className="text-2xl font-bold mb-6 text-[var(--ink)]">What kind of project is this?</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -182,7 +228,7 @@ export function SubmitForm() {
       )}
 
       {/* STEP 2: Project Details */}
-      {step === 2 && (
+      {effectiveStep === 2 && (
         <div className="animate-in slide-in-from-right-4 fade-in duration-200 space-y-8">
           <h2 className="text-2xl font-bold text-[var(--ink)]">About the Project</h2>
           
@@ -367,19 +413,44 @@ export function SubmitForm() {
       )}
 
       {/* STEP 3: Timeline, Budget, Files */}
-      {step === 3 && (
+      {effectiveStep === 3 && (
         <div className="animate-in slide-in-from-right-4 fade-in duration-200 space-y-8">
           <h2 className="text-2xl font-bold text-[var(--ink)]">Logistics</h2>
           
-          <div className="space-y-2">
+          <div className="space-y-2 relative" ref={datePickerRef}>
             <label className="text-sm font-semibold text-[var(--ink)]">Submission deadline *</label>
-            <input
-              type="date"
-              value={formData.deadline}
-              onChange={(e) => updateForm("deadline", e.target.value)}
-              className="w-full p-3 border outline-none focus:border-[var(--ink)] transition-colors"
-              style={{ borderColor: "var(--rule)", background: "var(--paper)" }}
-            />
+            <button
+              type="button"
+              onClick={() => setShowDatePicker(!showDatePicker)}
+              className="w-full p-3 border outline-none flex items-center justify-between transition-colors bg-[var(--paper)] text-left"
+              style={{ borderColor: "var(--rule)" }}
+            >
+              <span className={formData.deadline ? "text-[var(--ink)]" : "text-[var(--mute)]"}>
+                {formData.deadline ? format(new Date(formData.deadline), "PPP") : "Select a date..."}
+              </span>
+              <CalendarIcon className="w-5 h-5 text-[var(--mute)]" />
+            </button>
+            
+            {showDatePicker && (
+              <div className="absolute z-10 top-full mt-2 left-0 bg-white border p-3 shadow-lg" style={{ borderColor: "var(--rule)" }}>
+                <DayPicker 
+                  mode="single"
+                  selected={formData.deadline ? new Date(formData.deadline) : undefined}
+                  onSelect={(date) => {
+                    if (date) {
+                      updateForm("deadline", format(date, "yyyy-MM-dd"));
+                      setShowDatePicker(false);
+                    }
+                  }}
+                  disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))}
+                  style={{ 
+                    "--rdp-accent-color": "var(--ink)", 
+                    "--rdp-background-color": "var(--ink)",
+                    "--rdp-accent-background-color": "var(--ink)"
+                  } as React.CSSProperties}
+                />
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -398,27 +469,37 @@ export function SubmitForm() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-[var(--ink)]">Attach files (optional)</label>
-            <p className="text-sm text-[var(--mute)] mb-2">Most colleges give a project synopsis or problem statement — attach it here if you have one. (Max 3 files, 1MB each. PDF/DOC/PNG/JPG).</p>
+            <label className="text-sm font-semibold text-[var(--ink)]">Attach file (optional)</label>
+            <p className="text-sm text-[var(--mute)] mb-2">Most colleges give a project synopsis or problem statement — attach it here if you have one. <strong>1 file only, under 1MB</strong> (PDF/DOC/PNG/JPG).</p>
             
-            <div className="border border-dashed p-6 flex flex-col items-center justify-center bg-gray-50" style={{ borderColor: "var(--rule)" }}>
-              <UploadDropzone
-                endpoint="projectFiles"
-                content={{
-                  allowedContent: "PDF, DOC, Images (Max 1MB)",
-                }}
-                onClientUploadComplete={(res) => {
-                  if (res) {
-                    const uploadedFiles = res.map(f => ({ url: f.url, name: f.name, size: f.size }));
-                    updateForm("files", [...formData.files, ...uploadedFiles]);
-                  }
-                }}
-                onUploadError={(error: Error) => {
-                  alert(`Upload error: ${error.message}`);
-                }}
-                className="w-full ut-label:text-[var(--ink)] ut-button:bg-[var(--ink)] ut-button:ut-readying:bg-[var(--ink)]/50"
-              />
-            </div>
+            {formData.files.length === 0 && (
+              <div className="flex flex-col items-center gap-3 p-6 border border-dashed bg-gray-50" style={{ borderColor: "var(--rule)" }}>
+                <p className="text-sm text-[var(--mute)]">📎 Click to select your file</p>
+                <UploadButton
+                  endpoint="projectFiles"
+                  content={{
+                    button: "Choose file",
+                    allowedContent: "1 file · Max 1MB · PDF, DOC, PNG, JPG",
+                  }}
+                  onUploadBegin={() => {
+                    setFileError(null);
+                  }}
+                  onClientUploadComplete={(res) => {
+                    if (res?.[0]) {
+                      updateForm("files", [{ key: res[0].key, url: res[0].url, name: res[0].name, size: res[0].size }]);
+                      setFileError(null);
+                    }
+                  }}
+                  onUploadError={(error: Error) => {
+                    setFileError(`Upload failed: ${error.message}`);
+                  }}
+                  className="ut-button:bg-[var(--ink)] ut-button:text-white ut-button:px-6 ut-button:py-2 ut-allowed-content:text-[var(--mute)] ut-allowed-content:text-xs"
+                />
+                {fileError && (
+                  <p className="text-red-600 text-sm mt-2">{fileError}</p>
+                )}
+              </div>
+            )}
 
             {formData.files.length > 0 && (
               <div className="mt-4 space-y-2">
@@ -451,7 +532,7 @@ export function SubmitForm() {
       )}
 
       {/* STEP 4: Contact */}
-      {step === 4 && (
+      {effectiveStep === 4 && (
         <div className="animate-in slide-in-from-right-4 fade-in duration-200 space-y-8">
           <h2 className="text-2xl font-bold text-[var(--ink)]">How to reach you</h2>
           
@@ -480,11 +561,13 @@ export function SubmitForm() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-[var(--ink)]">Phone number *</label>
+              <label className="text-sm font-semibold text-[var(--ink)]">Phone number (10 digits) *</label>
               <input
                 type="tel"
+                maxLength={10}
+                placeholder="9876543210"
                 value={formData.phone}
-                onChange={(e) => updateForm("phone", e.target.value)}
+                onChange={(e) => updateForm("phone", e.target.value.replace(/\D/g, ""))}
                 className="w-full p-3 border outline-none focus:border-[var(--ink)] transition-colors"
                 style={{ borderColor: "var(--rule)", background: "var(--paper)" }}
               />
@@ -502,11 +585,13 @@ export function SubmitForm() {
 
             {!usePhoneForWhatsApp && (
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-[var(--ink)]">WhatsApp number *</label>
+                <label className="text-sm font-semibold text-[var(--ink)]">WhatsApp number (10 digits) *</label>
                 <input
                   type="tel"
+                  maxLength={10}
+                  placeholder="9876543210"
                   value={formData.whatsapp}
-                  onChange={(e) => updateForm("whatsapp", e.target.value)}
+                  onChange={(e) => updateForm("whatsapp", e.target.value.replace(/\D/g, ""))}
                   className="w-full p-3 border outline-none focus:border-[var(--ink)] transition-colors"
                   style={{ borderColor: "var(--rule)", background: "var(--paper)" }}
                 />
@@ -518,6 +603,7 @@ export function SubmitForm() {
             <label className="text-sm font-semibold text-[var(--ink)]">Email address *</label>
             <input
               type="email"
+              placeholder="you@domain.com"
               value={formData.email}
               onChange={(e) => updateForm("email", e.target.value)}
               className="w-full p-3 border outline-none focus:border-[var(--ink)] transition-colors"

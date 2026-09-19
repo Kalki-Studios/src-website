@@ -135,7 +135,7 @@ export default function HeroStepOne() {
                 <form onSubmit={handleContinue} className="space-y-4">
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-[var(--ink)] block">
-                      In one line, what is it?
+                      In one line, what is it? <span className="text-[var(--mute)] font-normal">(* Project Title)</span>
                     </label>
                     <input
                       ref={inputRef}

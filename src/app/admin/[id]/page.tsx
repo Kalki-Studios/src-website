@@ -20,6 +20,11 @@ export default async function RequestDetailPage({
     return notFound();
   }
 
+  if (req.status === "new") {
+    await db.update(requests).set({ status: "reviewing" }).where(eq(requests.id, req.id));
+    req.status = "reviewing";
+  }
+
   const reqAttachments = await db.select().from(attachments).where(eq(attachments.requestId, req.id));
 
   return (

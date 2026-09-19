@@ -39,24 +39,42 @@ export function RequestDetailClient({ request, attachments }: { request: any, at
             {CATEGORY_LABELS[request.category]} · Submitted {new Date(request.createdAt).toLocaleDateString("en-GB")}
           </div>
         </div>
-        
-        <select 
-          value={status}
-          onChange={(e) => handleStatusChange(e.target.value)}
-          className="p-2 text-sm font-bold border rounded outline-none appearance-none"
-          style={{ 
-            borderColor: "var(--rule)", 
-            color: status === "accepted" || status === "completed" ? "var(--go)" : "var(--ink)",
-            background: "var(--paper)"
-          }}
-        >
-          <option value="new">New ▾</option>
-          <option value="reviewing">Reviewing ▾</option>
-          <option value="accepted">Accepted ▾</option>
-          <option value="in_progress">In Progress ▾</option>
-          <option value="completed">Completed ▾</option>
-          <option value="rejected">Rejected ▾</option>
-        </select>
+        <div className="flex flex-col items-end gap-3">
+          <select 
+            value={status}
+            onChange={(e) => handleStatusChange(e.target.value)}
+            className="p-2 text-sm font-bold border rounded outline-none appearance-none"
+            style={{ 
+              borderColor: "var(--rule)", 
+              color: status === "accepted" || status === "completed" ? "var(--go)" : status === "rejected" ? "var(--flag)" : "var(--ink)",
+              background: "var(--paper)"
+            }}
+          >
+            <option value="new">New ▾</option>
+            <option value="reviewing">Reviewing ▾</option>
+            <option value="accepted">Accepted ▾</option>
+            <option value="in_progress">In Progress ▾</option>
+            <option value="completed">Completed ▾</option>
+            <option value="rejected">Rejected ▾</option>
+          </select>
+
+          {(status === "new" || status === "reviewing") && (
+            <div className="flex gap-2">
+              <button 
+                onClick={() => handleStatusChange("rejected")}
+                className="px-4 py-1.5 text-sm font-bold text-[var(--flag)] border border-[var(--flag)] hover:bg-red-50 transition-colors"
+              >
+                Reject
+              </button>
+              <button 
+                onClick={() => handleStatusChange("accepted")}
+                className="px-4 py-1.5 text-sm font-bold text-white bg-[var(--go)] hover:opacity-90 transition-opacity"
+              >
+                Accept
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <hr className="my-6 border-[var(--rule)]" />
@@ -149,7 +167,7 @@ export function RequestDetailClient({ request, attachments }: { request: any, at
                   <span className="truncate max-w-[70%] font-mono text-[var(--ink)]">{att.fileName}</span>
                   <div className="flex gap-4">
                     <span className="text-[var(--mute)] tabular-nums font-mono">{Math.round(att.sizeBytes / 1024)} KB</span>
-                    <a href={att.storagePath} target="_blank" rel="noopener noreferrer" className="font-semibold text-[var(--ink)] hover:underline">Download</a>
+                    <a href={att.fileUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-[var(--ink)] hover:underline">Download</a>
                   </div>
                 </div>
               ))}

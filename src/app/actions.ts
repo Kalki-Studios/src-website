@@ -34,7 +34,8 @@ export async function submitProjectRequest(formData: any): Promise<SubmitResult>
       await db.insert(attachments).values(
         formData.files.map((file: any) => ({
           requestId: newRequest.id,
-          storagePath: file.url, // Using UFS URL
+          storageKey: file.key ?? file.url,  // UploadThing key or fallback to URL
+          fileUrl: file.url,
           fileName: file.name,
           sizeBytes: file.size,
         }))

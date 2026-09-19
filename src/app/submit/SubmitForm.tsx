@@ -399,7 +399,7 @@ export function SubmitForm() {
 
           <div className="space-y-2">
             <label className="text-sm font-semibold text-[var(--ink)]">Attach files (optional)</label>
-            <p className="text-sm text-[var(--mute)] mb-2">Most colleges give a project synopsis or problem statement — attach it here if you have one. (Max 3 files, 10MB each. PDF/DOC/PNG/JPG).</p>
+            <p className="text-sm text-[var(--mute)] mb-2">Most colleges give a project synopsis or problem statement — attach it here if you have one. (Max 3 files, 1MB each. PDF/DOC/PNG/JPG).</p>
             
             <div className="border border-dashed p-6 flex flex-col items-center justify-center bg-gray-50" style={{ borderColor: "var(--rule)" }}>
               <UploadDropzone

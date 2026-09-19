@@ -141,7 +141,7 @@ export default function HeroStepOne() {
                       ref={inputRef}
                       type="text"
                       value={title}
-                      onChange={(e) => setTitle(e.target.value)}
+                      onChange={(e) => setTitle(e.target.value.toUpperCase())}
                       onFocus={() => setIsFocused(true)}
                       onBlur={() => setIsFocused(false)}
                       placeholder={selectedCategoryData?.examples[exampleIndex] || ""}

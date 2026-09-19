@@ -237,7 +237,7 @@ export function SubmitForm() {
             <input
               type="text"
               value={formData.title}
-              onChange={(e) => updateForm("title", e.target.value)}
+              onChange={(e) => updateForm("title", e.target.value.toUpperCase())}
               placeholder="e.g. Smart Attendance System"
               className="w-full p-3 border outline-none focus:border-[var(--ink)] transition-colors"
               style={{ borderColor: "var(--rule)", background: "var(--paper)" }}
@@ -542,7 +542,7 @@ export function SubmitForm() {
               <input
                 type="text"
                 value={formData.studentName}
-                onChange={(e) => updateForm("studentName", e.target.value)}
+                onChange={(e) => updateForm("studentName", e.target.value.toUpperCase())}
                 className="w-full p-3 border outline-none focus:border-[var(--ink)] transition-colors"
                 style={{ borderColor: "var(--rule)", background: "var(--paper)" }}
               />
@@ -552,7 +552,7 @@ export function SubmitForm() {
               <input
                 type="text"
                 value={formData.college}
-                onChange={(e) => updateForm("college", e.target.value)}
+                onChange={(e) => updateForm("college", e.target.value.toUpperCase())}
                 className="w-full p-3 border outline-none focus:border-[var(--ink)] transition-colors"
                 style={{ borderColor: "var(--rule)", background: "var(--paper)" }}
               />

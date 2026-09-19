@@ -40,23 +40,16 @@ export function RequestDetailClient({ request, attachments }: { request: any, at
           </div>
         </div>
         <div className="flex flex-col items-end gap-3">
-          <select 
-            value={status}
-            onChange={(e) => handleStatusChange(e.target.value)}
-            className="p-2 text-sm font-bold border rounded outline-none appearance-none"
+          <div 
+            className="p-2 px-4 text-sm font-bold border rounded"
             style={{ 
               borderColor: "var(--rule)", 
-              color: status === "accepted" || status === "completed" ? "var(--go)" : status === "rejected" ? "var(--flag)" : "var(--ink)",
+              color: status === "in_progress" || status === "accepted" || status === "completed" ? "var(--go)" : status === "rejected" ? "var(--flag)" : "var(--ink)",
               background: "var(--paper)"
             }}
           >
-            <option value="new">New ▾</option>
-            <option value="reviewing">Reviewing ▾</option>
-            <option value="accepted">Accepted ▾</option>
-            <option value="in_progress">In Progress ▾</option>
-            <option value="completed">Completed ▾</option>
-            <option value="rejected">Rejected ▾</option>
-          </select>
+            {status === "in_progress" ? "In Progress" : status.charAt(0).toUpperCase() + status.slice(1)}
+          </div>
 
           {(status === "new" || status === "reviewing") && (
             <div className="flex gap-2">
@@ -67,12 +60,21 @@ export function RequestDetailClient({ request, attachments }: { request: any, at
                 Reject
               </button>
               <button 
-                onClick={() => handleStatusChange("accepted")}
+                onClick={() => handleStatusChange("in_progress")}
                 className="px-4 py-1.5 text-sm font-bold text-white bg-[var(--go)] hover:opacity-90 transition-opacity"
               >
                 Accept
               </button>
             </div>
+          )}
+
+          {status === "in_progress" && (
+            <button 
+              onClick={() => handleStatusChange("completed")}
+              className="mt-2 px-4 py-1.5 text-sm font-bold text-white bg-[var(--ink)] hover:opacity-90 transition-opacity"
+            >
+              Mark Completed
+            </button>
           )}
         </div>
       </div>

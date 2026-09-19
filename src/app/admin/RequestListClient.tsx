@@ -22,7 +22,9 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
         req.studentName.toLowerCase().includes(q) ||
         req.college.toLowerCase().includes(q) ||
         req.title.toLowerCase().includes(q) ||
-        req.refCode.toLowerCase().includes(q);
+        req.refCode.toLowerCase().includes(q) ||
+        req.phone.toLowerCase().includes(q) ||
+        req.email.toLowerCase().includes(q);
       if (!matches) return false;
     }
     
@@ -117,7 +119,7 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
       <div className="flex gap-4">
         <input 
           type="text" 
-          placeholder="Search name, college, title..." 
+          placeholder="Search by ref code, name, phone, email, college..." 
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full sm:max-w-md p-2 border text-sm outline-none focus:border-[var(--ink)] transition-colors bg-white"

@@ -80,3 +80,30 @@ export async function deleteAllRejectedRequests() {
   await db.delete(requests).where(eq(requests.status, "rejected"));
   revalidatePath("/admin");
 }
+
+export async function deleteAllCompletedRequests() {
+  const completedRequests = await db
+    .select({ id: requests.id })
+    .from(requests)
+    .where(eq(requests.status, "completed"));
+
+  if (completedRequests.length === 0) return;
+
+  const completedIds = completedRequests.map(r => r.id);
+
+  const filesToDelete = await db
+    .select({ storageKey: attachments.storageKey })
+    .from(attachments)
+    .where(inArray(attachments.requestId, completedIds));
+
+  if (filesToDelete.length > 0) {
+    try {
+      await utapi.deleteFiles(filesToDelete.map(f => f.storageKey));
+    } catch (e) {
+      console.error("Failed to bulk delete files from UploadThing", e);
+    }
+  }
+
+  await db.delete(requests).where(eq(requests.status, "completed"));
+  revalidatePath("/admin");
+}

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { formatDaysLeft, getUrgency, CATEGORY_LABELS, STATUS_LABELS, BUDGET_LABELS } from "@/lib/utils/helpers";
-import { toggleStar, deleteRequest, deleteAllRejectedRequests } from "./actions";
+import { toggleStar, deleteRequest, deleteAllRejectedRequests, deleteAllCompletedRequests } from "./actions";
 
 type RequestData = any; // We can type this strictly later if needed
 
@@ -12,7 +12,9 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmBulkDelete, setConfirmBulkDelete] = useState<'rejected' | 'completed' | null>(null);
   const [isDeletingAll, setIsDeletingAll] = useState(false);
+  const [isDeletingAllCompleted, setIsDeletingAllCompleted] = useState(false);
 
   const filtered = requests.filter(req => {
     if (filterStatus !== "all" && req.status !== filterStatus) return false;
@@ -54,11 +56,26 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
   };
 
   const handleDeleteAllRejected = async () => {
-    if (!confirm("Are you sure you want to delete ALL rejected projects? This cannot be undone.")) return;
-    setIsDeletingAll(true);
-    await deleteAllRejectedRequests();
-    setRequests(prev => prev.filter(r => r.status !== "rejected"));
-    setIsDeletingAll(false);
+    setConfirmBulkDelete('rejected');
+  };
+
+  const handleDeleteAllCompleted = async () => {
+    setConfirmBulkDelete('completed');
+  };
+
+  const executeBulkDelete = async () => {
+    if (confirmBulkDelete === 'rejected') {
+      setIsDeletingAll(true);
+      await deleteAllRejectedRequests();
+      setRequests(prev => prev.filter(r => r.status !== "rejected"));
+      setIsDeletingAll(false);
+    } else if (confirmBulkDelete === 'completed') {
+      setIsDeletingAllCompleted(true);
+      await deleteAllCompletedRequests();
+      setRequests(prev => prev.filter(r => r.status !== "completed"));
+      setIsDeletingAllCompleted(false);
+    }
+    setConfirmBulkDelete(null);
   };
 
   const counts = {
@@ -142,6 +159,16 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
             className="px-4 py-2 text-sm font-bold text-white bg-red-500 hover:bg-red-600 rounded transition-colors disabled:opacity-50 shrink-0"
           >
             {isDeletingAll ? "Deleting..." : "Delete All Rejected"}
+          </button>
+        )}
+
+        {filterStatus === "completed" && counts.completed > 0 && (
+          <button
+            onClick={handleDeleteAllCompleted}
+            disabled={isDeletingAllCompleted}
+            className="px-4 py-2 text-sm font-bold text-white bg-red-500 hover:bg-red-600 rounded transition-colors disabled:opacity-50 shrink-0"
+          >
+            {isDeletingAllCompleted ? "Deleting..." : "Delete All Completed"}
           </button>
         )}
       </div>
@@ -256,8 +283,8 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
 
       {/* Delete Confirmation Modal */}
       {deletingId && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white p-6 max-w-sm w-full rounded shadow-xl">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="bg-white p-6 max-w-sm w-full rounded shadow-xl animate-in zoom-in-95 duration-200">
             <h3 className="text-lg font-bold text-[var(--ink)] mb-2">Delete Request?</h3>
             <p className="text-sm text-[var(--mute)] mb-6">
               Are you sure you want to delete this request? This action cannot be undone and will delete any attached files.
@@ -265,16 +292,45 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
             <div className="flex gap-3 justify-end">
               <button 
                 onClick={() => setDeletingId(null)}
-                className="px-4 py-2 text-sm font-semibold border rounded hover:bg-gray-50"
+                className="px-4 py-2 text-sm font-semibold border rounded hover:bg-gray-50 transition-colors"
                 style={{ borderColor: "var(--rule)", color: "var(--ink)" }}
               >
                 Cancel
               </button>
               <button 
                 onClick={confirmDelete}
-                className="px-4 py-2 text-sm font-semibold bg-red-500 text-white rounded hover:bg-red-600"
+                className="px-4 py-2 text-sm font-semibold bg-red-500 text-white rounded hover:bg-red-600 transition-colors shadow-sm"
               >
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Delete Confirmation Modal */}
+      {confirmBulkDelete && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="bg-white p-6 max-w-sm w-full rounded shadow-xl animate-in zoom-in-95 duration-200">
+            <h3 className="text-lg font-bold text-[var(--ink)] mb-2">Delete All {confirmBulkDelete === 'rejected' ? 'Rejected' : 'Completed'}?</h3>
+            <p className="text-sm text-[var(--mute)] mb-6">
+              Are you sure you want to permanently delete <strong>ALL</strong> {confirmBulkDelete} projects? This action cannot be undone and will permanently delete all of their attached files.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button 
+                onClick={() => setConfirmBulkDelete(null)}
+                disabled={isDeletingAll || isDeletingAllCompleted}
+                className="px-4 py-2 text-sm font-semibold border rounded hover:bg-gray-50 transition-colors disabled:opacity-50"
+                style={{ borderColor: "var(--rule)", color: "var(--ink)" }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={executeBulkDelete}
+                disabled={isDeletingAll || isDeletingAllCompleted}
+                className="px-4 py-2 text-sm font-semibold bg-red-500 text-white rounded hover:bg-red-600 transition-colors shadow-sm flex items-center gap-2 disabled:opacity-50"
+              >
+                {(isDeletingAll || isDeletingAllCompleted) ? "Deleting..." : "Delete All"}
               </button>
             </div>
           </div>

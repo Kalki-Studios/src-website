@@ -198,18 +198,6 @@ export default function Portfolio() {
             </h2>
           </div>
 
-          {/* Toggle */}
-          {!showAll && (
-            <button
-              onClick={() => setShowAll(true)}
-              className="text-sm font-medium transition-colors duration-150 whitespace-nowrap"
-              style={{ color: "var(--mute)" }}
-              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--ink)")}
-              onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--mute)")}
-            >
-              View all {PROJECTS.length} projects
-            </button>
-          )}
         </div>
 
         {/* Grid */}

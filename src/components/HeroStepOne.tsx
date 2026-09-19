@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-/* ── Reduced-motion hook ── */
+import Link from "next/link";
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
@@ -167,6 +167,15 @@ export default function HeroStepOne() {
             )}
           </AnimatePresence>
 
+        </div>
+
+        <div className="mt-5 text-center">
+          <Link 
+            href="/status" 
+            className="inline-flex items-center gap-2 text-sm font-medium text-[var(--mute)] hover:text-[var(--ink)] transition-colors"
+          >
+            Already submitted? Check project status →
+          </Link>
         </div>
       </div>
     </section>

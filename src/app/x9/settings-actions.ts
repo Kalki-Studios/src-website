@@ -19,19 +19,37 @@ export async function getSettings() {
   return currentSettings;
 }
 
-export async function updatePassword(newPassword: string) {
+export async function saveAllSettings({ 
+  newPassword, 
+  isUnderConstruction, 
+  autoDeleteTimer,
+  whatsappTemplate
+}: { 
+  newPassword?: string, 
+  isUnderConstruction: boolean, 
+  autoDeleteTimer: number,
+  whatsappTemplate?: string
+}) {
   const currentSettings = await getSettings();
-  await db.update(settings)
-    .set({ adminPassword: newPassword })
-    .where(eq(settings.id, currentSettings.id));
-}
-
-export async function toggleUnderConstruction(isOn: boolean) {
-  const currentSettings = await getSettings();
-  await db.update(settings)
-    .set({ isUnderConstruction: isOn })
-    .where(eq(settings.id, currentSettings.id));
   
-  // Revalidate public routes to immediately reflect changes
+  const updates: any = {
+    isUnderConstruction,
+    autoDeleteTimer
+  };
+  
+  if (whatsappTemplate) {
+    updates.whatsappTemplate = whatsappTemplate;
+  }
+  
+  if (newPassword) {
+    updates.adminPassword = newPassword;
+  }
+  
+  await db.update(settings)
+    .set(updates)
+    .where(eq(settings.id, currentSettings.id));
+    
+  // Revalidate routes to immediately reflect changes
   revalidatePath("/", "layout");
+  revalidatePath("/x9");
 }

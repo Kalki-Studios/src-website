@@ -4,6 +4,8 @@ import { desc } from "drizzle-orm";
 import { headers } from "next/headers";
 import { RequestListClient } from "./RequestListClient";
 
+import { getSettings } from "./settings-actions";
+
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
@@ -18,6 +20,7 @@ export default async function AdminDashboardPage() {
   } catch {}
 
   const allRequests = await db.select().from(requests).orderBy(desc(requests.createdAt));
+  const currentSettings = await getSettings();
 
-  return <RequestListClient initialRequests={allRequests} />;
+  return <RequestListClient initialRequests={allRequests} autoDeleteTimer={currentSettings.autoDeleteTimer} />;
 }

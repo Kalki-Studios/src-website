@@ -7,6 +7,7 @@ import {
   jsonb,
   timestamp,
   serial,
+  integer,
 } from "drizzle-orm/pg-core";
 
 // ─── Project Requests ────────────────────────────────────────────
@@ -61,6 +62,8 @@ export const settings = pgTable("settings", {
   id: serial("id").primaryKey(),
   adminPassword: text("admin_password").notNull(),
   isUnderConstruction: boolean("is_under_construction").default(false).notNull(),
+  autoDeleteTimer: integer("auto_delete_timer").default(2880).notNull(), // default 2 days in minutes
+  whatsappTemplate: text("whatsapp_template").default("Hi {name}, this is regarding your project request {ref} ({title}). I can take this up. Let's discuss the details.").notNull(),
 });
 
 // ─── Types ───────────────────────────────────────────────────────

@@ -7,15 +7,15 @@ import { UploadButton } from "@/components/ui/uploadthing";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, AppWindow, Smartphone, BrainCircuit, Cpu, Monitor, Compass } from "lucide-react";
 
 const CATEGORIES = [
-  { id: "web", label: "Website / Web App", icon: "</>" },
-  { id: "app", label: "Mobile App", icon: "📱" },
-  { id: "ml", label: "ML / AI", icon: "🧠" },
-  { id: "iot", label: "IoT / Hardware", icon: "🔌" },
-  { id: "software", label: "Desktop Software", icon: "🖥️" },
-  { id: "unsure", label: "Not Sure Yet", icon: "?" },
+  { id: "web", label: "Website / Web App", icon: <AppWindow size={28} strokeWidth={1.5} /> },
+  { id: "app", label: "Mobile App", icon: <Smartphone size={28} strokeWidth={1.5} /> },
+  { id: "ml", label: "ML / AI", icon: <BrainCircuit size={28} strokeWidth={1.5} /> },
+  { id: "iot", label: "IoT / Hardware", icon: <Cpu size={28} strokeWidth={1.5} /> },
+  { id: "software", label: "Desktop Software", icon: <Monitor size={28} strokeWidth={1.5} /> },
+  { id: "unsure", label: "Not Sure Yet", icon: <Compass size={28} strokeWidth={1.5} /> },
 ];
 
 const BUDGET_BANDS = [
@@ -219,7 +219,7 @@ export function SubmitForm() {
                 className="flex items-center gap-4 p-6 text-left border hover:border-[var(--ink)] transition-colors duration-150 bg-white"
                 style={{ borderColor: formData.category === cat.id ? "var(--ink)" : "var(--rule)" }}
               >
-                <div className="text-2xl font-mono opacity-80">{cat.icon}</div>
+                <div className="text-[var(--ink)] opacity-80">{cat.icon}</div>
                 <div className="font-semibold text-[var(--ink)]">{cat.label}</div>
               </button>
             ))}

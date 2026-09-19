@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { updateStatus, updateAdminNotes } from "../actions";
 import { formatDaysLeft, CATEGORY_LABELS, BUDGET_LABELS } from "@/lib/utils/helpers";
 
-export function RequestDetailClient({ request, attachments }: { request: any, attachments: any[] }) {
+export function RequestDetailClient({ request, attachments, whatsappTemplate = "Hi {name}, this is regarding your project request {ref} ({title}). I can take this up. Let's discuss the details." }: { request: any, attachments: any[], whatsappTemplate?: string }) {
   const [status, setStatus] = useState(request.status);
   const [notes, setNotes] = useState(request.adminNotes || "");
   const [savingNotes, setSavingNotes] = useState(false);
@@ -26,7 +26,12 @@ export function RequestDetailClient({ request, attachments }: { request: any, at
     alert("Details copied to clipboard!");
   };
 
-  const whatsappMessage = `Hi ${request.studentName.split(" ")[0]}, this is regarding your project request ${request.refCode} (${request.title}). I can take this up. Let's discuss the details.`;
+  const firstName = request.studentName.split(" ")[0];
+  const whatsappMessage = whatsappTemplate
+    .replace(/{name}/g, firstName)
+    .replace(/{ref}/g, request.refCode)
+    .replace(/{title}/g, request.title);
+    
   const whatsappUrl = `https://wa.me/${request.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(whatsappMessage)}`;
 
   return (
@@ -56,7 +61,7 @@ export function RequestDetailClient({ request, attachments }: { request: any, at
 
             return (
               <div 
-                className="absolute top-4 right-4 sm:top-6 sm:right-6 py-1 px-3 text-xs font-bold border rounded-sm shadow-sm"
+                className="py-1 px-3 text-xs font-bold border rounded-sm shadow-sm"
                 style={badgeStyle}
               >
                 {status === "in_progress" ? "In Progress" : status.charAt(0).toUpperCase() + status.slice(1)}

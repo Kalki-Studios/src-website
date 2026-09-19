@@ -7,7 +7,7 @@ import { toggleStar, deleteRequest, deleteAllRejectedRequests, deleteAllComplete
 
 type RequestData = any; // We can type this strictly later if needed
 
-export function RequestListClient({ initialRequests }: { initialRequests: RequestData[] }) {
+export function RequestListClient({ initialRequests, autoDeleteTimer }: { initialRequests: RequestData[], autoDeleteTimer: number }) {
   const [requests, setRequests] = useState<RequestData[]>(initialRequests);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -250,10 +250,10 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
                   {req.status === "rejected" && req.rejectedAt && (() => {
                     const rejectedDate = new Date(req.rejectedAt);
                     const deleteDate = new Date(rejectedDate);
-                    deleteDate.setMinutes(deleteDate.getMinutes() + 2); // 2 minutes for testing
-                    const minutesLeft = Math.ceil((deleteDate.getTime() - Date.now()) / (1000 * 60));
+                    deleteDate.setMinutes(deleteDate.getMinutes() + autoDeleteTimer);
+                    const msLeft = deleteDate.getTime() - Date.now();
                     
-                    if (minutesLeft <= 0) {
+                    if (msLeft <= 0) {
                       return (
                         <div className="text-xs text-red-500 flex items-center gap-1 text-right font-bold">
                           🕐 <span>Deleting on next refresh...</span>
@@ -261,6 +261,17 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
                       );
                     }
                     
+                    const hoursLeft = Math.ceil(msLeft / (1000 * 60 * 60));
+                    if (hoursLeft > 24) {
+                      const daysLeft = Math.ceil(hoursLeft / 24);
+                      return (
+                        <div className="text-xs text-[var(--mute)] flex items-center gap-1 text-right">
+                          🕐 <span>Auto-delete in {daysLeft}d</span>
+                        </div>
+                      );
+                    }
+                    
+                    const minutesLeft = Math.ceil(msLeft / (1000 * 60));
                     return (
                       <div className="text-xs text-[var(--mute)] flex items-center gap-1 text-right">
                         🕐 <span>Auto-delete in {minutesLeft}m</span>

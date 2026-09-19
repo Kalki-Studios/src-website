@@ -13,9 +13,14 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Delete rejected projects older than 2 minutes (FOR TESTING)
+  // Get global settings for the timer
+  const { settings } = await import("@/lib/db/schema");
+  let [currentSettings] = await db.select().from(settings).limit(1);
+  const timerMinutes = currentSettings?.autoDeleteTimer ?? 2880;
+
+  // Delete rejected projects older than the configured timer
   const threshold = new Date();
-  threshold.setMinutes(threshold.getMinutes() - 2);
+  threshold.setMinutes(threshold.getMinutes() - timerMinutes);
 
   const requestsToDelete = await db
     .select({ id: requests.id })

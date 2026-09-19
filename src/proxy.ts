@@ -7,19 +7,19 @@ const SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Protect all /admin routes except /admin/login
-  if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
+  // Protect all /x9 routes except /x9/login
+  if (pathname.startsWith("/x9") && pathname !== "/x9/login") {
     const token = request.cookies.get("src_admin_session")?.value;
 
     if (!token) {
-      return NextResponse.redirect(new URL("/admin/login", request.url));
+      return NextResponse.redirect(new URL("/x9/login", request.url));
     }
 
     try {
       await jwtVerify(token, SECRET);
       return NextResponse.next();
-    } catch {
-      const response = NextResponse.redirect(new URL("/admin/login", request.url));
+    } catch (e) {
+      const response = NextResponse.redirect(new URL("/x9/login", request.url));
       response.cookies.delete("src_admin_session");
       return response;
     }
@@ -29,5 +29,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/x9/:path*"],
 };

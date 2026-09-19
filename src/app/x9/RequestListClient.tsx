@@ -221,7 +221,7 @@ export function RequestListClient({ initialRequests }: { initialRequests: Reques
                   </div>
                   
                   <Link 
-                    href={`/admin/${req.id}`} 
+                    href={`/x9/${req.id}`} 
                     className={`block ${req.status === "rejected" ? "pointer-events-none opacity-60" : ""}`}
                   >
                     <div className="flex flex-wrap items-center gap-2 mb-2">

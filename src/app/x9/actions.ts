@@ -13,7 +13,7 @@ export async function toggleStar(id: string, starred: boolean) {
     .set({ starred })
     .where(eq(requests.id, id));
   
-  revalidatePath("/admin");
+  revalidatePath("/x9");
 }
 
 export async function updateStatus(id: string, status: string) {
@@ -24,8 +24,8 @@ export async function updateStatus(id: string, status: string) {
     })
     .where(eq(requests.id, id));
   
-  revalidatePath("/admin");
-  revalidatePath(`/admin/${id}`);
+  revalidatePath("/x9");
+  revalidatePath(`/x9/${id}`);
 }
 
 export async function updateAdminNotes(id: string, notes: string) {
@@ -33,7 +33,7 @@ export async function updateAdminNotes(id: string, notes: string) {
     .set({ adminNotes: notes })
     .where(eq(requests.id, id));
   
-  revalidatePath(`/admin/${id}`);
+  revalidatePath(`/x9/${id}`);
 }
 
 export async function deleteRequest(id: string) {
@@ -51,7 +51,7 @@ export async function deleteRequest(id: string) {
   }
 
   await db.delete(requests).where(eq(requests.id, id));
-  revalidatePath("/admin");
+  revalidatePath("/x9");
 }
 
 export async function deleteAllRejectedRequests() {
@@ -78,7 +78,7 @@ export async function deleteAllRejectedRequests() {
   }
 
   await db.delete(requests).where(eq(requests.status, "rejected"));
-  revalidatePath("/admin");
+  revalidatePath("/x9");
 }
 
 export async function deleteAllCompletedRequests() {
@@ -105,5 +105,5 @@ export async function deleteAllCompletedRequests() {
   }
 
   await db.delete(requests).where(eq(requests.status, "completed"));
-  revalidatePath("/admin");
+  revalidatePath("/x9");
 }

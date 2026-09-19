@@ -1,4 +1,4 @@
-import { getSettings } from "@/app/admin/settings-actions";
+import { getSettings } from "@/app/x9/settings-actions";
 import { Wrench, Cpu, Cable, CircuitBoard, Wifi } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";

@@ -30,9 +30,8 @@ export default async function RequestDetailPage({
   return (
     <div className="bg-white border pb-24 relative" style={{ borderColor: "var(--rule)" }}>
       <div className="p-4 sm:p-6 border-b" style={{ borderColor: "var(--rule)" }}>
-        <Link href="/admin" className="text-sm font-semibold text-[var(--mute)] hover:text-[var(--ink)] mb-4 inline-block">
-          ← Back
-        </Link>
+        <Link href="/x9" className="text-sm font-semibold text-[var(--mute)] hover:text-[var(--ink)] mb-4 inline-block">
+          &larr; Back to Dashboard       </Link>
         <RequestDetailClient request={req} attachments={reqAttachments} />
       </div>
     </div>

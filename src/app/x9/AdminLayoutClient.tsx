@@ -9,20 +9,20 @@ export function AdminLayoutClient({ children, storageWidget }: { children: React
   const pathname = usePathname();
   const router = useRouter();
 
-  if (pathname === "/admin/login") {
+  if (pathname === "/x9/login") {
     return <>{children}</>;
   }
 
   const handleLogout = async () => {
     await adminLogout();
-    router.push("/admin/login");
+    router.push("/x9/login");
   };
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       <header className="bg-white border-b sticky top-0 z-10" style={{ borderColor: "var(--rule)" }}>
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link href="/admin" className="font-bold text-[var(--ink)] tracking-tight text-lg">
+          <Link href="/x9" className="font-bold text-[var(--ink)] tracking-tight text-lg">
             SRC <span className="font-normal">Dashboard</span>
           </Link>
           <div className="flex items-center">

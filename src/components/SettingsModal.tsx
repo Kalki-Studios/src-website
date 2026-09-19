@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Settings } from "lucide-react";
-import { getSettings, updatePassword, toggleUnderConstruction } from "../app/admin/settings-actions";
+import { getSettings, updatePassword, toggleUnderConstruction } from "../app/x9/settings-actions";
 import { X, Save, ShieldAlert, CheckCircle2, Lock } from "lucide-react";
 
 export function SettingsModal() {

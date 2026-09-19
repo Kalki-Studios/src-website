@@ -19,7 +19,7 @@ export function LoginForm() {
     const result = await adminLogin(formData);
 
     if (result.success) {
-      router.push("/admin");
+      router.push("/x9");
     } else {
       setError(result.error || "Login failed");
       setLoading(false);

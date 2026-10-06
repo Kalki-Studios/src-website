@@ -67,6 +67,15 @@ export default function Navbar() {
           >
             Check Status
           </Link>
+          <Link
+            href="/store"
+            className="text-sm font-medium transition-colors duration-150"
+            style={{ color: "var(--mute)" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--ink)")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--mute)")}
+          >
+            Store
+          </Link>
         </div>
 
         {/* CTA */}

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import FloatingElectronics from "./FloatingElectronics";
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
@@ -71,6 +72,7 @@ export default function HeroStepOne() {
     <section className="relative min-h-screen flex flex-col justify-center overflow-hidden pt-20 pb-12">
       {/* Grid texture background */}
       <div className="absolute inset-0 grid-texture-faint pointer-events-none" />
+      <FloatingElectronics />
 
       <div className="relative max-w-3xl mx-auto px-6 w-full mt-12 mb-16">
         

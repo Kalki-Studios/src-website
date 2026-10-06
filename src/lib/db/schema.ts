@@ -66,8 +66,31 @@ export const settings = pgTable("settings", {
   whatsappTemplate: text("whatsapp_template").default("Hi {name}, this is regarding your project request {ref} ({title}). I can take this up. Let's discuss the details.").notNull(),
 });
 
+// ─── Product Categories ──────────────────────────────────────────
+export const productCategories = pgTable("product_categories", {
+  id:        uuid("id").primaryKey().defaultRandom(),
+  name:      text("name").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ─── Products ────────────────────────────────────────────────────
+export const products = pgTable("products", {
+  id:          uuid("id").primaryKey().defaultRandom(),
+  name:        text("name").notNull(),
+  description: text("description"),
+  price:       integer("price").notNull(),              // price in INR paise (e.g. 49900 = ₹499)
+  category:    text("category"),                        // free-form text, linked to productCategories.name
+  images:      jsonb("images").$type<string[]>().default([]),
+  inStock:     boolean("in_stock").default(true).notNull(),
+  featured:    boolean("featured").default(false).notNull(),
+  createdAt:   timestamp("created_at").defaultNow().notNull(),
+  updatedAt:   timestamp("updated_at").defaultNow().notNull(),
+});
+
 // ─── Types ───────────────────────────────────────────────────────
-export type Request    = typeof requests.$inferSelect;
-export type NewRequest = typeof requests.$inferInsert;
-export type Attachment = typeof attachments.$inferSelect;
-export type Settings   = typeof settings.$inferSelect;
+export type Request         = typeof requests.$inferSelect;
+export type NewRequest      = typeof requests.$inferInsert;
+export type Attachment      = typeof attachments.$inferSelect;
+export type Settings        = typeof settings.$inferSelect;
+export type Product         = typeof products.$inferSelect;
+export type ProductCategory = typeof productCategories.$inferSelect;

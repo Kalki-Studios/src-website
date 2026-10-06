@@ -46,6 +46,7 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable}`}
+      data-scroll-behavior="smooth"
     >
       <body className="min-h-screen antialiased" style={{ background: "var(--paper)", color: "var(--ink)" }}>
         {children}

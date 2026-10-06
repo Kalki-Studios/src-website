@@ -3,6 +3,7 @@ import { Wrench, Cpu, Cable, CircuitBoard, Wifi } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { MobileStoreButton } from "@/components/MobileStoreButton";
 
 // Force Next.js to dynamically check settings on every request (prevents the page from being stuck on cached true/false)
 export const dynamic = "force-dynamic";
@@ -51,5 +52,10 @@ export default async function PublicLayout({
     );
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <MobileStoreButton />
+    </>
+  );
 }

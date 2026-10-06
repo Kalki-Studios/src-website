@@ -46,3 +46,16 @@ next-env.d.ts
 
 SRC - Website & Project Management System.pdf
 project-intake-design-brief.md
+
+# AI Agent Instructions / Logs
+AGENTS.md
+CLAUDE.md
+.agents/
+.gemini/
+
+# Scratch Scripts
+/check_db.ts
+/fix_db.ts
+/sync_categories.ts
+/test-delete.ts
+*.scratch.*
